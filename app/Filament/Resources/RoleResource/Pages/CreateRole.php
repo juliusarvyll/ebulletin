@@ -7,9 +7,12 @@ use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use App\Filament\Resources\NotifiesAdmins;
 
 class CreateRole extends CreateRecord
 {
+    use NotifiesAdmins;
+
     protected static string $resource = RoleResource::class;
 
     public Collection $permissions;
@@ -43,5 +46,10 @@ class CreateRole extends CreateRecord
         });
 
         $this->record->syncPermissions($permissionModels);
+
+        $this->notifyAdmins(
+            'Role Created',
+            'A new role was created by ' . auth()->user()->name
+        );
     }
 }

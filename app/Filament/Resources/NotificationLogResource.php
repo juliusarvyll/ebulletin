@@ -12,6 +12,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Model;
 
 class NotificationLogResource extends Resource
 {
@@ -54,7 +55,7 @@ class NotificationLogResource extends Resource
 
                 Forms\Components\Textarea::make('error')
                     ->maxLength(65535)
-                    ->visible(fn ($record) => !$record->success)
+                    ->visible(fn ($record) => $record && !$record->success)
                     ->disabled(),
 
                 Forms\Components\KeyValue::make('data')
@@ -86,7 +87,7 @@ class NotificationLogResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('error')
-                    ->visible(fn ($record) => !$record->success)
+                    ->visible(fn ($record) => $record && !$record->success)
                     ->limit(50),
             ])
             ->defaultSort('created_at', 'desc')
@@ -141,5 +142,25 @@ class NotificationLogResource extends Resource
             'index' => Pages\ListNotificationLogs::route('/'),
             'view' => Pages\ViewNotificationLog::route('/{record}'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->hasRole('admin');
     }
 }

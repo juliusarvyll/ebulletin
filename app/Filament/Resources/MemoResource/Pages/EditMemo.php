@@ -11,9 +11,12 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\MemoPublished;
 use App\Models\User;
 use App\Notifications\MemoNotification;
+use App\Filament\Resources\NotifiesAdmins;
 
 class EditMemo extends EditRecord
 {
+    use NotifiesAdmins;
+
     protected static string $resource = MemoResource::class;
 
     public function getTitle(): string | Htmlable
@@ -57,6 +60,11 @@ class EditMemo extends EditRecord
         elseif ($memo->is_published && ($memo->wasChanged('title') || $memo->wasChanged('content'))) {
             $this->sendFcmNotifications($memo, 'updated');
         }
+
+        $this->notifyAdmins(
+            'Memo Updated',
+            'A memo was updated by ' . auth()->user()->name
+        );
     }
 
     /**

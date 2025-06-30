@@ -10,9 +10,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\MemoPublished;
+use App\Filament\Resources\NotifiesAdmins;
 
 class CreateMemo extends CreateRecord
 {
+    use NotifiesAdmins;
+
     protected static string $resource = MemoResource::class;
 
     protected function getRedirectUrl(): string
@@ -33,6 +36,11 @@ class CreateMemo extends CreateRecord
             // Dispatch the MemoPublished event
             event(new \App\Events\MemoPublished($memo));
         }
+
+        $this->notifyAdmins(
+            'Memo Created',
+            'A new memo was created by ' . auth()->user()->name
+        );
     }
 
     /**

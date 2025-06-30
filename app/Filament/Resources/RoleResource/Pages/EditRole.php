@@ -8,9 +8,12 @@ use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use App\Filament\Resources\NotifiesAdmins;
 
 class EditRole extends EditRecord
 {
+    use NotifiesAdmins;
+
     protected static string $resource = RoleResource::class;
 
     public Collection $permissions;
@@ -50,5 +53,10 @@ class EditRole extends EditRecord
         });
 
         $this->record->syncPermissions($permissionModels);
+
+        $this->notifyAdmins(
+            'Role Updated',
+            'A role was updated by ' . auth()->user()->name
+        );
     }
 }
